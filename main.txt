@@ -1,0 +1,50 @@
+import psycopg2
+
+username = 'AntonK_KM_02'
+password = '2222'
+database = 'db_lab2_Kaznovskyi'
+host = 'localhost'
+port = '5432'
+
+query_1 = '''
+SELECT TRIM(certifications.certification_name) AS certificate_type, COUNT(courses.certification_id) 
+FROM courses 
+JOIN certifications ON certifications.certification_id = courses.certification_id
+GROUP BY certification_name
+'''
+
+query_2 = '''
+SELECT TRIM(difficulty.difficulty_level) AS difficulty, COUNT(courses.difficulty_id) FROM courses 
+JOIN difficulty ON difficulty.difficulty_id = courses.difficulty_id
+GROUP BY difficulty_level
+ORDER BY COUNT(courses.difficulty_id)
+'''
+
+query_3 = '''
+SELECT TRIM(course_title) AS course_title, amount_of_students AS amount_of_students_k  FROM courses
+WHERE amount_of_students < 100.0
+ORDER BY amount_of_students 
+'''
+
+conn = psycopg2.connect(user=username, password=password, dbname=database, host=host, port=port)
+print(type(conn))
+
+with conn:
+
+    print("\nDatabase opened successfully\n")
+    cur = conn.cursor()
+
+    print('1) quantity of each certification type\n')
+    cur.execute(query_1)
+    for row in cur:
+        print(row)
+
+    print('\n2) quantity of courses difficulty levels \n')
+    cur.execute(query_2)
+    for row in cur:
+        print(row)
+
+    print('\n3) Amount of student`s on each course (student`s < 100.000)\n')
+    cur.execute(query_3)
+    for row in cur:
+        print(row)
